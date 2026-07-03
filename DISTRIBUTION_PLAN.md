@@ -14,11 +14,12 @@
 - [x] **1a** `OCR/KeyValidator.swift` — live validation calls + `KeyStatus` + error→plain-English map ✅ build-verified
 - [x] **1b** `Models/ProviderKeySpec.swift` — Gemini + Mistral specs (deep links, steps, notes, precheck) ✅ build-verified (Sendable + @Sendable closures)
 - [x] **1c** `Views/ProviderKeyWizard.swift` — reusable wizard (explain → open page → paste → validate → status) ✅ build-verified
-- [ ] **1d** `Views/SettingsView.swift` — per-provider status chip, "Set up keys (guided)" entry, manual-edit resets validated flag
-- [ ] **1e** first-run presentation + bundled sample image + end-to-end sample-OCR test (adds `ocrNotEnabled`/`needsBilling` at test time)
+- [x] **1d** `Views/SettingsView.swift` — "Set up keys (guided)" button + wizard sheet + Validated/Saved chips; manual edit clears validated flag ✅ build-verified · committed `c6957d8`
+- [x] **1e** first-run wizard (ContentView, when no key present; skipped in test mode) + `SampleOCRTester` (synthetic-image end-to-end OCR test) + wizard "Test OCR on a sample page" step ✅ build-verified
 - [ ] **1f** adversarial review + fixes + commit/push
 Convention per increment: add files → `xcodegen generate` (if new files) → `xcodebuild -scheme ArchiveProcessor -configuration Debug … build` must succeed → commit locally → tick the box + set NEXT ACTION here.
-**NEXT ACTION:** 1d — integrate the wizard into `SettingsView` (guided "Set up keys" button + status chips). Committed so far: `KeyValidator`, `ProviderKeySpec`, `ProviderKeyWizard` (1a–1c).
+Live-grounded: Gemini validation endpoint returns 200 for a good key, 400/API_KEY_INVALID for a bad one (matches `KeyValidator`).
+**NEXT ACTION:** 1f — adversarial review of the Phase-1 diff, fix, then push. After Phase 1: Phase 2 polish (clipboard-detect banner, EEA pre-warn, 429 batch throttle, screenshots), then Phase 3 (ArchiveCore + iPhone).
 
 ## 1. Context & goal
 Adoption is blocked because non-technical users (historians/archivists) can't make their own API keys. Rather than the developer selling API access (too hard: revenue, tax, store cuts, backend, liability — see the superseded plan), the app will **guide each user to create their own free Gemini + Mistral keys in ~2–3 minutes each**, validate them, and store them in the Keychain. Keep the existing bring-your-own-key/gateway path (this *is* that path, upgraded). Also ship an **iPhone capture companion** alongside the Android one and get all apps into the stores.
