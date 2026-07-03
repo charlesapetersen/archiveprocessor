@@ -9,6 +9,17 @@
 
 ---
 
+## ▶ Build progress — RESUME HERE (updated after every increment, for durability)
+**Phase 1 (guided key onboarding, macOS) — `IN PROGRESS`.** Small, build-verified, committed increments so an interruption never loses work.
+- [x] **1a** `OCR/KeyValidator.swift` — live validation calls + `KeyStatus` + error→plain-English map ✅ build-verified
+- [x] **1b** `Models/ProviderKeySpec.swift` — Gemini + Mistral specs (deep links, steps, notes, precheck) ✅ build-verified (Sendable + @Sendable closures)
+- [x] **1c** `Views/ProviderKeyWizard.swift` — reusable wizard (explain → open page → paste → validate → status) ✅ build-verified
+- [ ] **1d** `Views/SettingsView.swift` — per-provider status chip, "Set up keys (guided)" entry, manual-edit resets validated flag
+- [ ] **1e** first-run presentation + bundled sample image + end-to-end sample-OCR test (adds `ocrNotEnabled`/`needsBilling` at test time)
+- [ ] **1f** adversarial review + fixes + commit/push
+Convention per increment: add files → `xcodegen generate` (if new files) → `xcodebuild -scheme ArchiveProcessor -configuration Debug … build` must succeed → commit locally → tick the box + set NEXT ACTION here.
+**NEXT ACTION:** 1d — integrate the wizard into `SettingsView` (guided "Set up keys" button + status chips). Committed so far: `KeyValidator`, `ProviderKeySpec`, `ProviderKeyWizard` (1a–1c).
+
 ## 1. Context & goal
 Adoption is blocked because non-technical users (historians/archivists) can't make their own API keys. Rather than the developer selling API access (too hard: revenue, tax, store cuts, backend, liability — see the superseded plan), the app will **guide each user to create their own free Gemini + Mistral keys in ~2–3 minutes each**, validate them, and store them in the Keychain. Keep the existing bring-your-own-key/gateway path (this *is* that path, upgraded). Also ship an **iPhone capture companion** alongside the Android one and get all apps into the stores.
 
