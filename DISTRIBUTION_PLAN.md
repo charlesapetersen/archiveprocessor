@@ -19,7 +19,13 @@
 - [x] **1f** adversarial review (5-agent workflow) → fixed 2 confirmed UX bugs: (i) stale OCR-test result surviving a key change/re-validate; (ii) Settings field not syncing after the wizard saves + a latent bug where opening Settings reset the Validated flag (keyField.onChange now ignores programmatic reloads) ✅ build-verified
 Convention per increment: add files → `xcodegen generate` (if new files) → `xcodebuild -scheme ArchiveProcessor -configuration Debug … build` must succeed → commit locally → tick the box + set NEXT ACTION here.
 Live-grounded: Gemini validation endpoint returns 200 for a good key, 400/API_KEY_INVALID for a bad one (matches `KeyValidator`).
-**NEXT ACTION:** push Phase 1, then start **Phase 2** polish — clipboard-detect paste banner, EEA/UK/CH locale pre-warn on Gemini, 429 batch throttle/backoff, `[USER]` screenshots/GIFs + verify provider wording; then **Phase 3** (extract `ArchiveCore` + iPhone companion). ⚠️ Still unverified: whether Mistral OCR needs the user's own card (free-tier OCR) — confirm via the wizard's Test-OCR against a real free Mistral key.
+**Phase 2 (onboarding polish, macOS) — `IN PROGRESS` (2a–2c built; reviewing).**
+- [x] **2a** clipboard-detect "Paste key" banner in the wizard; re-checks on `NSApplication.didBecomeActive` (when the user returns from the browser after copying) ✅ build-verified
+- [x] **2b** EEA/UK/CH locale pre-warn on the Gemini step (Google requires the paid tier there) — `Locale.current.region` vs a paid-only region set ✅ build-verified
+- [x] **2c** 429 handling: NetworkSession already backs off (global 5-concurrent limiter + exp backoff + Retry-After on 429/503/529); added `lastRateLimitedAt` + a "· pacing to your key's rate limit" suffix on the live OCR progress status ✅ build-verified
+- [ ] **2d** adversarial review + fixes + push
+`[USER]` (not Claude): supply provider screenshots/GIFs; verify Mistral OCR free-tier-vs-card via the wizard Test-OCR with a real Mistral key.
+**NEXT ACTION:** 2d — review Phase 2, then push. Phase 3 next (extract `ArchiveCore` + iPhone companion).
 
 ## 1. Context & goal
 Adoption is blocked because non-technical users (historians/archivists) can't make their own API keys. Rather than the developer selling API access (too hard: revenue, tax, store cuts, backend, liability — see the superseded plan), the app will **guide each user to create their own free Gemini + Mistral keys in ~2–3 minutes each**, validate them, and store them in the Keychain. Keep the existing bring-your-own-key/gateway path (this *is* that path, upgraded). Also ship an **iPhone capture companion** alongside the Android one and get all apps into the stores.
