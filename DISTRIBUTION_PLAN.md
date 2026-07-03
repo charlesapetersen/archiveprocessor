@@ -24,7 +24,7 @@ Live-grounded: Gemini validation endpoint returns 200 for a good key, 400/API_KE
 - [x] **2b** EEA/UK/CH locale pre-warn on the Gemini step (Google requires the paid tier there) — `Locale.current.region` vs a paid-only region set ✅ build-verified
 - [x] **2c** 429 handling: NetworkSession already backs off (global 5-concurrent limiter + exp backoff + Retry-After on 429/503/529); added `lastRateLimitedAt` + a "· pacing to your key's rate limit" suffix on the live OCR progress status ✅ build-verified
 - [x] **2d** adversarial review (1 reviewer) → fixed 1 low finding: Mistral's loose key-precheck would let the clipboard banner offer a mis-pasted Gemini `AIza…` key on the Mistral step (now rejects `AIza` prefix). Everything else reviewed clean ✅ build-verified
-`[USER]` (not Claude): supply provider screenshots/GIFs; verify Mistral OCR free-tier-vs-card via the wizard Test-OCR with a real Mistral key.
+`[USER]` (not Claude): supply provider screenshots/GIFs. (Mistral free-tier OCR now confirmed working with no card — live-tested 2026-07-03.)
 **NEXT ACTION:** push Phase 2, then **Phase 3** — extract a multiplatform `ArchiveCore` Swift package (OCR clients, ImageEncoding, NetworkSession, KeychainHelper, PDFGenerator, KeyValidator/ProviderKeySpec) shared by the Mac app, then build the iPhone capture companion (AVFoundation camera + QR pairing + the same key wizard). ⚠️ Phase 3 eventually needs `[USER]` Apple signing; the code/package extraction needs no accounts.
 
 ## 1. Context & goal
@@ -125,7 +125,7 @@ struct ProviderKeySpec {
 ### Mistral (optional/secondary)
 - **Deep links:** `https://console.mistral.ai/` (sign up) → `https://console.mistral.ai/api-keys` (create key).
 - **Steps:** sign up (email or Google/Microsoft/Apple SSO — SSO easiest) → **verify email** → **verify phone via SMS (required)** → API Keys → **Create new key** → **COPY IT NOW (shown once)** → paste.
-- ⚠️ **VERIFY (biggest open question):** whether `mistral-ocr` runs on the **free "Experiment" tier** or **requires the paid "Scale" plan + the user's own card**. Design defensively: try the free key; if OCR returns a plan/billing error, prompt "add your own card in Mistral (charges go to Mistral, not us)." Do **not** promise "free OCR."
+- ✅ **RESOLVED 2026-07-03 (live-tested):** a brand-new, no-billing Mistral key returned `mistral-ocr-latest` from `/v1/models` (HTTP 200) and a real `/v1/ocr` call succeeded (HTTP 200, a full page of text). **Mistral OCR works on the free tier with no credit card.** The defensive plan/billing prompt (`ocrNotEnabled`) stays as a fallback for any account/region that does gate OCR, but it won't fire for typical free accounts. Free-tier **rate/volume limits** still apply — bulk archival OCR can hit them (handled by NetworkSession backoff + the pacing note) and very heavy use may eventually need a paid plan.
 - **Privacy:** free tier **may train** unless the user disables **Admin Console → Privacy → "Anonymous improvement data"**; paid opted out by default; 30-day retention; ZDR available. Surface the opt-out for sensitive material. EU-hosted by default.
 - **Key format:** opaque, no prefix → validate only by API call.
 
@@ -158,7 +158,7 @@ Because all apps are **free and contain no purchases**, there is **no IAP, no Pl
 | Privacy labels / Data Safety / export-compliance **text**; Gradle targetSdk 36; entitlements/Info.plist | Create the user-facing sample image if a real archival page is preferred (Claude can bundle a placeholder from `Test Files/`) |
 
 ## 10. Risks & ⚠️ verify-before-ship
-- **Mistral OCR free-tier availability** — unclear; may need the user's own card (Scale plan). Design probes + prompts; verify live. *(highest-impact unknown)*
+- **Mistral OCR free-tier** — ✅ resolved (tested 2026-07-03): works free with **no card**. Residual: free-tier rate/volume limits may throttle bulk jobs (handled by NetworkSession backoff + the pacing note); very heavy use may eventually need a paid plan.
 - **Provider UI/limits/terms drift** — free-tier limits are dynamic (Dec-2025 cut); don't hardcode; screenshots go stale — keep copy provider-agnostic and `[USER]`-refreshable.
 - **Gemini "restrict key after 2026-06-19"** claim — verify; add optional nag.
 - **Privacy for archival PII** — free tiers may train on data; surface clear warnings + paid/opt-out paths before OCRing sensitive records.
@@ -178,4 +178,5 @@ Because all apps are **free and contain no purchases**, there is **no IAP, no Pl
 - Store/iOS-port details: see `MANAGED_ACCESS_PLAN.md` §5–6 (still valid; billing parts now moot).
 
 ## 13. Changelog
-- 2026-07-03 — Created from a 3-track web-research sweep (Gemini key flow, Mistral key flow, guided-onboarding UX). Supersedes MANAGED_ACCESS_PLAN.md. No code written yet; Phase 1 (the wizard) is ready to build and needs no user accounts.
+- 2026-07-03 — Created from a 3-track web-research sweep (Gemini key flow, Mistral key flow, guided-onboarding UX). Supersedes MANAGED_ACCESS_PLAN.md.
+- 2026-07-03 (later) — Phase 1 (guided key wizard) + Phase 2 (clipboard banner, EEA pre-warn, 429 pacing) built, adversarially reviewed, and pushed. **Live-tested a brand-new no-billing Mistral key: `/v1/models` + `/v1/ocr` both 200 — Mistral OCR works free with no credit card.** Wizard copy updated; the "may need a card" warning replaced with the accurate free-tier message. Both providers now confirmed usable on free, no-card keys.
