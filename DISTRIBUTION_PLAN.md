@@ -10,16 +10,16 @@
 ---
 
 ## ▶ Build progress — RESUME HERE (updated after every increment, for durability)
-**Phase 1 (guided key onboarding, macOS) — `IN PROGRESS`.** Small, build-verified, committed increments so an interruption never loses work.
+**Phase 1 (guided key onboarding, macOS) — `DONE` ✅ (build-verified; adversarially reviewed; pending push).** Small, build-verified, committed increments so an interruption never loses work.
 - [x] **1a** `OCR/KeyValidator.swift` — live validation calls + `KeyStatus` + error→plain-English map ✅ build-verified
 - [x] **1b** `Models/ProviderKeySpec.swift` — Gemini + Mistral specs (deep links, steps, notes, precheck) ✅ build-verified (Sendable + @Sendable closures)
 - [x] **1c** `Views/ProviderKeyWizard.swift` — reusable wizard (explain → open page → paste → validate → status) ✅ build-verified
 - [x] **1d** `Views/SettingsView.swift` — "Set up keys (guided)" button + wizard sheet + Validated/Saved chips; manual edit clears validated flag ✅ build-verified · committed `c6957d8`
 - [x] **1e** first-run wizard (ContentView, when no key present; skipped in test mode) + `SampleOCRTester` (synthetic-image end-to-end OCR test) + wizard "Test OCR on a sample page" step ✅ build-verified
-- [ ] **1f** adversarial review + fixes + commit/push
+- [x] **1f** adversarial review (5-agent workflow) → fixed 2 confirmed UX bugs: (i) stale OCR-test result surviving a key change/re-validate; (ii) Settings field not syncing after the wizard saves + a latent bug where opening Settings reset the Validated flag (keyField.onChange now ignores programmatic reloads) ✅ build-verified
 Convention per increment: add files → `xcodegen generate` (if new files) → `xcodebuild -scheme ArchiveProcessor -configuration Debug … build` must succeed → commit locally → tick the box + set NEXT ACTION here.
 Live-grounded: Gemini validation endpoint returns 200 for a good key, 400/API_KEY_INVALID for a bad one (matches `KeyValidator`).
-**NEXT ACTION:** 1f — adversarial review of the Phase-1 diff, fix, then push. After Phase 1: Phase 2 polish (clipboard-detect banner, EEA pre-warn, 429 batch throttle, screenshots), then Phase 3 (ArchiveCore + iPhone).
+**NEXT ACTION:** push Phase 1, then start **Phase 2** polish — clipboard-detect paste banner, EEA/UK/CH locale pre-warn on Gemini, 429 batch throttle/backoff, `[USER]` screenshots/GIFs + verify provider wording; then **Phase 3** (extract `ArchiveCore` + iPhone companion). ⚠️ Still unverified: whether Mistral OCR needs the user's own card (free-tier OCR) — confirm via the wizard's Test-OCR against a real free Mistral key.
 
 ## 1. Context & goal
 Adoption is blocked because non-technical users (historians/archivists) can't make their own API keys. Rather than the developer selling API access (too hard: revenue, tax, store cuts, backend, liability — see the superseded plan), the app will **guide each user to create their own free Gemini + Mistral keys in ~2–3 minutes each**, validate them, and store them in the Keychain. Keep the existing bring-your-own-key/gateway path (this *is* that path, upgraded). Also ship an **iPhone capture companion** alongside the Android one and get all apps into the stores.
@@ -137,7 +137,7 @@ Because all apps are **free and contain no purchases**, there is **no IAP, no Pl
 ## 8. Phased plan
 | Phase | What | Feasibility | Status |
 |---|---|---|---|
-| **1. Guided key onboarding (macOS)** — `ProviderKeySpec`, `KeyValidator` (validate + sample-OCR + error maps), `ProviderKeyWizard`, first-run + Settings integration, bundled sample. **The core of this plan; needs no user accounts to build.** | 🟢 [CLAUDE] | `NOT STARTED` |
+| **1. Guided key onboarding (macOS)** — `ProviderKeySpec`, `KeyValidator` (validate + sample-OCR + error maps), `ProviderKeyWizard`, first-run + Settings integration, bundled sample. **The core of this plan; needs no user accounts to build.** | 🟢 [CLAUDE] | `DONE` ✅ |
 | **2. Polish & bulletproofing** — clipboard detect/trim, locale-based EEA billing pre-warn, 429 throttle/backoff during batches, privacy notices, re-runnable "Test key", `[USER]` screenshots/GIFs + verify provider wording. | 🟢 [CLAUDE] / 🟡 [USER assets] | `NOT STARTED` |
 | **3. `ArchiveCore` package + iPhone companion** — extract shared package; build iOS capture app + same wizard. | 🟢 [CLAUDE] build / 🟡 [USER] signing | `NOT STARTED` |
 | **4. Store distribution** — Mac (MAS/DMG), iOS App Store, Android Play; privacy labels/Data Safety (Claude drafts), targetSdk 36. | 🟡 [CLAUDE drafts] / 🔴 [USER submits] | `NOT STARTED` |
