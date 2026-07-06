@@ -1,5 +1,16 @@
 # Archive Processor
 
+> ## 📦 Archive Processor now ships as part of **Archive Suite**
+>
+> This standalone repository is **archived (read-only)**. Development and releases have moved to the
+> **Archive Suite** monorepo, where Archive Processor lives alongside its companion app **Archive Reader**:
+>
+> ### → https://github.com/charlesapetersen/Archive-Suite
+>
+> Download the latest build from **[Archive Suite Releases](https://github.com/charlesapetersen/Archive-Suite/releases)**
+> — one DMG installs both apps. This repo stays up for historical reference; the full commit history
+> (v1.0.0–v3.8.2) is preserved inside the monorepo under `ArchiveProcessor/`.
+
 A native macOS application for processing historical archive photograph collections. Archive Processor performs OCR on scanned documents using multiple LLM providers, generates searchable PDFs, applies intelligent filesystem tags, and organizes files into archival collections.
 
 Built for archivists, historians, and researchers working with large digitized document collections.
